@@ -2,6 +2,7 @@ package main
 
 import (
 	"ecommerce/configs"
+	"ecommerce/handlers"
 	"ecommerce/migrations"
 	"ecommerce/seeders"
 
@@ -19,6 +20,20 @@ func main() {
 	seeders.DatabaseSeeder(configs.DB)
 
 	route := gin.Default()
+
+	//products
+	route.GET("/product", handlers.ListProduct(configs.DB))
+	route.GET("/product/:id", handlers.GetProduct(configs.DB))
+	route.POST("/product", handlers.CreateProduct(configs.DB))
+	route.PUT("/product/:id", handlers.UpdateProduct(configs.DB))
+	route.DELETE("/product/:id", handlers.DeleteProduct(configs.DB))
+
+	//product categories
+	route.GET("/product-categories", handlers.GetProductCategories(configs.DB))
+	route.GET("/product-categories/:id", handlers.GetProductCategoriesById(configs.DB))
+	route.POST("/product-categories", handlers.CreateProductCategories(configs.DB))
+	route.PUT("/product-categories/:id", handlers.UpdateProductCategories(configs.DB))
+	route.DELETE("/product-categories/:id", handlers.DeleteProductCategories(configs.DB))
 
 	// route.GET("/", func(c *gin.Context) {
 	// 	c.JSON(200, gin.H{
