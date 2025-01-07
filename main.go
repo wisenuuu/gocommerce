@@ -3,6 +3,7 @@ package main
 import (
 	"ecommerce/configs"
 	"ecommerce/handlers"
+	"ecommerce/middlewares"
 	"ecommerce/migrations"
 	"ecommerce/seeders"
 
@@ -22,18 +23,21 @@ func main() {
 	route := gin.Default()
 
 	//products
-	route.GET("/product", handlers.ListProduct(configs.DB))
-	route.GET("/product/:id", handlers.GetProduct(configs.DB))
-	route.POST("/product", handlers.CreateProduct(configs.DB))
-	route.PUT("/product/:id", handlers.UpdateProduct(configs.DB))
-	route.DELETE("/product/:id", handlers.DeleteProduct(configs.DB))
+	route.GET("/product", middlewares.AuthMiddleware(), handlers.ListProduct(configs.DB))
+	route.GET("/product/:id", middlewares.AuthMiddleware(), handlers.GetProduct(configs.DB))
+	route.POST("/product", middlewares.AuthMiddleware(), handlers.CreateProduct(configs.DB))
+	route.PUT("/product/:id", middlewares.AuthMiddleware(), handlers.UpdateProduct(configs.DB))
+	route.DELETE("/product/:id", middlewares.AuthMiddleware(), handlers.DeleteProduct(configs.DB))
 
 	//product categories
-	route.GET("/product-categories", handlers.GetProductCategories(configs.DB))
-	route.GET("/product-categories/:id", handlers.GetProductCategoriesById(configs.DB))
-	route.POST("/product-categories", handlers.CreateProductCategories(configs.DB))
-	route.PUT("/product-categories/:id", handlers.UpdateProductCategories(configs.DB))
-	route.DELETE("/product-categories/:id", handlers.DeleteProductCategories(configs.DB))
+	route.GET("/product-categories", middlewares.AuthMiddleware(), handlers.GetProductCategories(configs.DB))
+	route.GET("/product-categories/:id", middlewares.AuthMiddleware(), handlers.GetProductCategoriesById(configs.DB))
+	route.POST("/product-categories", middlewares.AuthMiddleware(), handlers.CreateProductCategories(configs.DB))
+	route.PUT("/product-categories/:id", middlewares.AuthMiddleware(), handlers.UpdateProductCategories(configs.DB))
+	route.DELETE("/product-categories/:id", middlewares.AuthMiddleware(), handlers.DeleteProductCategories(configs.DB))
+
+	//authentication
+	route.POST("/login", handlers.Login(configs.DB))
 
 	// route.GET("/", func(c *gin.Context) {
 	// 	c.JSON(200, gin.H{
