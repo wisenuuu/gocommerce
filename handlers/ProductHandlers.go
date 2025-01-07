@@ -11,7 +11,8 @@ import (
 type Response struct {
 	Success string      `json:"success"`
 	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Data    interface{} `json:"data,omitempty"`
+	Token   string      `json:"token,omitempty"`
 }
 
 func ListProduct(db *gorm.DB) gin.HandlerFunc {
