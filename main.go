@@ -42,6 +42,9 @@ func main() {
 	route.POST("/login", handlers.Login(configs.DB))
 	route.POST("/register", handlers.Register(configs.DB))
 
+	route.POST("/transactions", handlers.CreateTransaction(configs.DB))
+	route.GET("/transactions/:id", handlers.GetTransactionWithItems(configs.DB))
+
 	route.GET("/debug/pprof/*pprof", gin.WrapH(http.DefaultServeMux))
 
 	// route.GET("/", func(c *gin.Context) {
