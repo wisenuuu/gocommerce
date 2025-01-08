@@ -6,6 +6,8 @@ import (
 	"ecommerce/middlewares"
 	"ecommerce/migrations"
 	"ecommerce/seeders"
+	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,6 +40,9 @@ func main() {
 
 	//authentication
 	route.POST("/login", handlers.Login(configs.DB))
+	route.POST("/register", handlers.Register(configs.DB))
+
+	route.GET("/debug/pprof/*pprof", gin.WrapH(http.DefaultServeMux))
 
 	// route.GET("/", func(c *gin.Context) {
 	// 	c.JSON(200, gin.H{
