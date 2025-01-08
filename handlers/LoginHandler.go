@@ -12,7 +12,7 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var input models.User
 		if err := c.ShouldBindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, Response{
+			c.JSON(http.StatusBadRequest, models.Response{
 				Success: "failed",
 				Message: "Invalid Input",
 				Data:    nil,
@@ -22,7 +22,7 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 
 		var user models.User
 		if err := db.Where("username = ?", input.Username).First(&user).Error; err != nil {
-			c.JSON(http.StatusUnauthorized, Response{
+			c.JSON(http.StatusUnauthorized, models.Response{
 				Success: "failed",
 				Message: "Unauthorized",
 				Data:    nil,
@@ -34,7 +34,7 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 
 		token, err := CreateToken(user.ID)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusInternalServerError, models.Response{
 				Success: "failed",
 				Message: "Internal Server Error",
 				Data:    nil,
@@ -42,7 +42,7 @@ func Login(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, Response{
+		c.JSON(http.StatusOK, models.Response{
 			Success: "success",
 			Message: "User Account Login successfully",
 			Token:    token,

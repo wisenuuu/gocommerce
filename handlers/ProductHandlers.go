@@ -8,20 +8,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type Response struct {
-	Success string      `json:"success"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
-	Token   string      `json:"token,omitempty"`
-}
-
 func ListProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var products []models.Product
 
 		// Mengambil data produk dari database
 		if err := db.Find(&products).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusInternalServerError, models.Response{
 				Success: "failed",
 				Message: "Failed to fetch products",
 				Data:    nil,
@@ -29,7 +22,7 @@ func ListProduct(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, Response{
+		c.JSON(http.StatusOK, models.Response{
 			Success: "success",
 			Message: "List of products",
 			Data:    products,
@@ -44,7 +37,7 @@ func GetProduct(db *gorm.DB) gin.HandlerFunc {
 
 		// Memeriksa apakah produk dengan ID tertentu ada
 		if err := db.First(&product, id).Error; err != nil {
-			c.JSON(http.StatusNotFound, Response{
+			c.JSON(http.StatusNotFound, models.Response{
 				Success: "failed",
 				Message: "Product not found",
 				Data:    nil,
@@ -52,7 +45,7 @@ func GetProduct(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, Response{
+		c.JSON(http.StatusOK, models.Response{
 			Success: "success",
 			Message: "Product found",
 			Data:    product,
@@ -66,7 +59,7 @@ func CreateProduct(db *gorm.DB) gin.HandlerFunc {
 
 		// Validasi request body
 		if err := c.ShouldBindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, Response{
+			c.JSON(http.StatusBadRequest, models.Response{
 				Success: "failed",
 				Message: "Invalid request body",
 				Data:    nil,
@@ -80,7 +73,7 @@ func CreateProduct(db *gorm.DB) gin.HandlerFunc {
 			Select("count(*) > 0").
 			Where("id = ?", input.CategoryID).
 			Find(&categoryExists).Error; err != nil || !categoryExists {
-			c.JSON(http.StatusNotFound, Response{
+			c.JSON(http.StatusNotFound, models.Response{
 				Success: "failed",
 				Message: "Category not found",
 				Data:    nil,
@@ -90,7 +83,7 @@ func CreateProduct(db *gorm.DB) gin.HandlerFunc {
 
 		// Buat produk baru
 		if err := db.Create(&input).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusInternalServerError, models.Response{
 				Success: "failed",
 				Message: "Failed to create product",
 				Data:    nil,
@@ -98,7 +91,7 @@ func CreateProduct(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusCreated, Response{
+		c.JSON(http.StatusCreated, models.Response{
 			Success: "success",
 			Message: "Product created successfully",
 			Data:    input,
@@ -113,7 +106,7 @@ func UpdateProduct(db *gorm.DB) gin.HandlerFunc {
 
 		// Memeriksa apakah produk dengan ID tertentu ada
 		if err := db.First(&product, id).Error; err != nil {
-			c.JSON(http.StatusNotFound, Response{
+			c.JSON(http.StatusNotFound, models.Response{
 				Success: "failed",
 				Message: "Product not found",
 				Data:    nil,
@@ -124,7 +117,7 @@ func UpdateProduct(db *gorm.DB) gin.HandlerFunc {
 		var input models.Product
 		// Validasi request body
 		if err := c.ShouldBindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, Response{
+			c.JSON(http.StatusBadRequest, models.Response{
 				Success: "failed",
 				Message: "Invalid input",
 				Data:    nil,
@@ -135,7 +128,7 @@ func UpdateProduct(db *gorm.DB) gin.HandlerFunc {
 		// Validasi apakah CategoryID ada
 		if input.CategoryID != 0 {
 			if err := db.First(&models.ProductCategory{}, input.CategoryID).Error; err != nil {
-				c.JSON(http.StatusNotFound, Response{
+				c.JSON(http.StatusNotFound, models.Response{
 					Success: "failed",
 					Message: "Category not found",
 					Data:    nil,
@@ -146,7 +139,7 @@ func UpdateProduct(db *gorm.DB) gin.HandlerFunc {
 
 		// Update produk
 		if err := db.Model(&product).Updates(input).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusInternalServerError, models.Response{
 				Success: "failed",
 				Message: "Failed to update product",
 				Data:    nil,
@@ -154,7 +147,7 @@ func UpdateProduct(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, Response{
+		c.JSON(http.StatusOK, models.Response{
 			Success: "success",
 			Message: "Product updated successfully",
 			Data:    product,
@@ -169,7 +162,7 @@ func DeleteProduct(db *gorm.DB) gin.HandlerFunc {
 
 		// Memeriksa apakah produk dengan ID tertentu ada
 		if err := db.First(&product, id).Error; err != nil {
-			c.JSON(http.StatusNotFound, Response{
+			c.JSON(http.StatusNotFound, models.Response{
 				Success: "failed",
 				Message: "Product not found",
 				Data:    nil,
@@ -179,7 +172,7 @@ func DeleteProduct(db *gorm.DB) gin.HandlerFunc {
 
 		// Hapus produk
 		if err := db.Delete(&product).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, Response{
+			c.JSON(http.StatusInternalServerError, models.Response{
 				Success: "failed",
 				Message: "Failed to delete product",
 				Data:    nil,
@@ -187,7 +180,7 @@ func DeleteProduct(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, Response{
+		c.JSON(http.StatusOK, models.Response{
 			Success: "success",
 			Message: "Product deleted successfully",
 			Data:    product,
